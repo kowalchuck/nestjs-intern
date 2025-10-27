@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -20,7 +20,7 @@ model Customer {
   email String @unique
   name String
   phone_number String @unique
-  followed Int[]
+  followedProducts Item[]
   orders Order[]
 }
 
@@ -32,12 +32,15 @@ model Category {
 
 model Item {
   id Int @id @default(autoincrement())
+  name String @default("Default product name")
   price Float
-  rating Int
+  rating Int?
   description String
   createdAt DateTime @default(now())
-  category Category @relation(fields: [categoryName], references: [name])
-  categoryName String
+  category Category? @relation(fields: [categoryName], references: [name])
+  categoryName String?
+  customer Customer? @relation(fields: [customerId], references: [id])
+  customerId Int?
   orders Order[]
 }
 
