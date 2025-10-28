@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -14,30 +14,34 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Customer {
+model User {
   id Int @id @default(autoincrement())
   createdAt DateTime @default(now())
+  role UserRole @default(USER)
   email String @unique
+  pass_hash String
   name String
   phone_number String @unique
-  followed Int[]
+  followedProducts Product[]
   orders Order[]
 }
 
 model Category {
   id Int @id @default(autoincrement())
   name String @unique
-  items Item[]
+  products Product[]
 }
 
-model Item {
+model Product {
   id Int @id @default(autoincrement())
+  name String @default("Default product name")
   price Float
-  rating Int
+  rating Int?
   description String
   createdAt DateTime @default(now())
-  category Category @relation(fields: [categoryName], references: [name])
-  categoryName String
+  category Category? @relation(fields: [categoryName], references: [name])
+  categoryName String?
+  users User[]
   orders Order[]
 }
 
@@ -45,14 +49,19 @@ model Order {
   id Int @id @default(autoincrement())
   quantity Int
   status OrderStatus
-  customer Customer @relation(fields: [customerId], references: [id])
-  customerId Int
-  item Item @relation(fields: [itemId], references: [id])
-  itemId Int
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+  product Product @relation(fields: [productId], references: [id])
+  productId Int
 }
 
 enum OrderStatus {
   PACKING
   SHIPPING
   ARRIVED
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
